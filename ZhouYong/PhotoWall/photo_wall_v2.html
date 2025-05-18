@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我们的爱情回忆</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            perspective: 1000px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        .photo-container {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            margin: 50px 0;
+        }
+        
+        .heart-shape {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            transform-style: preserve-3d;
+            animation: rotateHeart 20s infinite linear;
+        }
+        
+        .photo-item {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s ease;
+            transform-origin: center center;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .photo-item:hover {
+            transform: scale(1.1) translateZ(50px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            border-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .photo-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 10px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .music-control {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .music-control:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .music-info {
+            margin-left: 10px;
+            margin-right: 15px;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .music-info .title {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(255, 0, 0, 0.6);
+            animation: float 5s linear infinite;
+            opacity: 0;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            max-width: 80%;
+            max-height: 80%;
+            position: relative;
+        }
+        
+        .modal-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes rotateHeart {
+            0% {
+                transform: rotateY(0) rotateX(10deg);
+            }
+            100% {
+                transform: rotateY(360deg) rotateX(10deg);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .photo-item {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .heart-shape {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" id="hearts"></div>
+    
+    <div class="header">
+        <h1>我们的爱情回忆</h1>
+    </div>
+    
+    <div class="photo-container">
+        <div class="heart-shape" id="heartShape"></div>
+    </div>
+    
+    <div class="music-player">
+        <button class="music-control" id="playBtn">▶️</button>
+        <div class="music-info">
+            <div class="title">一定要爱</div>
+            <div class="artist">背景音乐</div>
+        </div>
+    </div>
+    
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModal">×</button>
+            <img id="modalImage" src="" alt="放大图片">
+        </div>
+    </div>
+    <!--
+    <audio id="bgMusic" loop>
+        <source src="https://music.163.com/song/media/outer/url?id=1824045033.mp3" type="audio/mpeg">
+        <source src="https://music.163.com/song/media/outer/url?id=287035.mp3" type="audio/mpeg">
+    </audio>-->
+    <audio id="bgMusic" loop>
+        <source src="audios/一定要爱你 - 田一龙.m4a" type="audio/mpeg">
+    </audio>
+    
+    
+    <script>
+        // Autoplay is only allowed when approved by the user, the site is activated by the user, or media is muted （firefox和google都会)
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     console.log('DOMContentLoaded');
+        //     // 播放背景音乐
+        //     playBackgroundMusic();
+        // });
+
+        // 模拟从本地images目录加载图片
+        // 实际使用时，请确保在项目目录下创建images文件夹并放入图片
+        // 图片命名如: photo1.jpg, photo2.jpg, photo3.jpg...
+        function loadLocalImages() {
+            const imageCount = 36; // 假设有16张图片
+            const images = [];
+            
+            for (let i = 1; i <= imageCount; i++) {
+                images.push(`images/photo_${i}.jpg`);
+            }
+            
+            return images;
+        }
+        
+        // 创建心形照片墙
+        function createHeartPhotoWall() {
+            const heartShape = document.getElementById('heartShape');
+            const images = loadLocalImages();
+            
+            // 清空容器
+            heartShape.innerHTML = '';
+            
+            // 为每张图片创建元素并定位到心形上
+            images.forEach((imgSrc, index) => {
+                const angle = (index / images.length) * Math.PI * 2;
+                const radiusX = 150;
+                const radiusY = 130;
+                
+                // 心形曲线参数方程
+                const t = angle;
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+                
+                // 归一化并缩放
+                const scale = 15;
+                const posX = x * scale;
+                const posY = y * scale;
+                
+                // 3D深度
+                const zPos = (Math.random() * 100) - 50;
+                const rotateY = (Math.random() * 60) - 30;
+                const rotateX = (Math.random() * 30) - 15;
+                
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.style.transform = `translate3d(${posX}px, ${posY}px, ${zPos}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+                
+                // 延迟动画
+                photoItem.style.transitionDelay = `${index * 0.05}s`;
+                
+                // 创建图片元素
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = `我们的照片 ${index + 1}`;
+                
+                // 点击放大
+                photoItem.addEventListener('click', () => {
+                    document.getElementById('modalImage').src = imgSrc;
+                    document.getElementById('imageModal').classList.add('active');
+                });
+                
+                photoItem.appendChild(img);
+                heartShape.appendChild(photoItem);
+            });
+        }
+        
+        // 音乐播放器功能
+        let isPlaying = false;
+        const bgMusic = document.getElementById('bgMusic');
+        const playBtn = document.getElementById('playBtn');
+        function playBackgroundMusic() {
+            if (isPlaying) {
+                bgMusic.pause();
+                playBtn.textContent = '▶️';
+            } else {
+                bgMusic.play();
+                playBtn.textContent = '⏸️';
+            }
+            isPlaying = !isPlaying;
+
+            bgMusic.play();
+        }
+
+        // 点击播放按钮
+        playBtn.addEventListener('click', () => {
+           playBackgroundMusic();
+        });
+
+        // const bgMusic = document.getElementById('bgMusic');
+        // const playBtn = document.getElementById('playBtn');
+        // let isPlaying = true;
+        
+        // // 点击播放按钮
+        // playBtn.addEventListener('click', () => {
+        //     if (isPlaying) {
+        //         bgMusic.pause();
+        //         playBtn.textContent = '▶️';
+        //     } else {
+        //         bgMusic.play();
+        //         playBtn.textContent = '⏸️';
+        //     }
+        //     isPlaying = !isPlaying;
+        // });
+        
+        // 自动播放音乐 (需要用户交互后:点击背景)
+        document.addEventListener('click', () => {
+            if (!isPlaying) {
+                bgMusic.play();
+                playBtn.textContent = '⏸️';
+                isPlaying = true;
+            }
+        }, { once: true });
+        
+        // 关闭模态框
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('imageModal').classList.remove('active');
+        });
+        
+        // 点击模态框背景关闭
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('imageModal')) {
+                document.getElementById('imageModal').classList.remove('active');
+            }
+        });
+        
+        // 创建漂浮的心形
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartIcons = ['❤️', '💖', '💗', '💓', '💞', '💕'];
+            
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+                
+                // 随机位置
+                heart.style.left = `${Math.random() * 100}vw`;
+                heart.style.top = `${Math.random() * 100 + 100}vh`;
+                
+                // 随机大小
+                const size = Math.random() * 20 + 10;
+                heart.style.fontSize = `${size}px`;
+                
+                // 随机动画持续时间
+                const duration = Math.random() * 3 + 3;
+                heart.style.animationDuration = `${duration}s`;
+                
+                heartsContainer.appendChild(heart);
+                
+                // 动画结束后移除
+                setTimeout(() => {
+                    heart.remove();
+                }, duration * 1000);
+            }, 300);
+        }
+        
+        // 初始化
+        window.addEventListener('load', () => {
+            createHeartPhotoWall();
+            createHearts();
+            
+            // 初始动画
+            setTimeout(() => {
+                document.querySelectorAll('.photo-item').forEach(item => {
+                    item.style.opacity = '1';
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
